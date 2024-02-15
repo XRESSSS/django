@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: our_database
+      POSTGRES_USER: our_user
+    ports:
+      - "5434:5432"
+
+
+  web-app:
+    build: .
+    restart: always
+#    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_NAME: our_database
+      DB_USER: our_user
+      DB_PASSWORD: postgres
+    volumes:
+      - ./library:/library
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db
+    command: sh -c "python manage.py runserver 0.0.0.0:8082 "
+
+
+volumes:
+  library:
